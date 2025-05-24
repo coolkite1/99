@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS3 彩色灯光模拟器</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background-color: #222;
+            margin: 0;
+            overflow: hidden;
+        }
+        
+        .control-panel {
+            margin-bottom: 30px;
+        }
+        
+        button {
+            padding: 12px 24px;
+            margin: 0 10px;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+            background-color: #4a4a4a;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background-color: #5a5a5a;
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        #startBtn {
+            background-color: #2ecc71;
+        }
+        
+        #stopBtn {
+            background-color: #e74c3c;
+        }
+        
+        .lights-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 30px;
+            flex-wrap: wrap;
+            max-width: 800px;
+        }
+        
+        .light {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            box-shadow: 0 0 20px 10px rgba(255, 255, 255, 0.3);
+            transition: all 0.5s ease;
+            opacity: 0.7;
+        }
+        
+        /* 初始颜色设置 - 确保7个不同颜色 */
+        .light:nth-child(1) { background-color: #ff0000; } /* 红 */
+        .light:nth-child(2) { background-color: #ff7f00; } /* 橙 */
+        .light:nth-child(3) { background-color: #ffff00; } /* 黄 */
+        .light:nth-child(4) { background-color: #00ff00; } /* 绿 */
+        .light:nth-child(5) { background-color: #0000ff; } /* 蓝 */
+        .light:nth-child(6) { background-color: #4b0082; } /* 靛 */
+        .light:nth-child(7) { background-color: #9400d3; } /* 紫 */
+        
+        /* 动画效果 */
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.7;
+                box-shadow: 0 0 20px 10px rgba(255, 255, 255, 0.3);
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 1;
+                box-shadow: 0 0 30px 15px rgba(255, 255, 255, 0.6);
+            }
+        }
+        
+        .light.active {
+            animation: pulse 1.5s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="control-panel">
+        <button id="startBtn">启动</button>
+        <button id="stopBtn">停止</button>
+    </div>
+    
+    <div class="lights-container">
+        <div class="light" id="light1"></div>
+        <div class="light" id="light2"></div>
+        <div class="light" id="light3"></div>
+        <div class="light" id="light4"></div>
+        <div class="light" id="light5"></div>
+        <div class="light" id="light6"></div>
+        <div class="light" id="light7"></div>
+    </div>
+
+    <script>
+        const colors = [
+            '#ff0000', // 红
+            '#ff7f00', // 橙
+            '#ffff00', // 黄
+            '#00ff00', // 绿
+            '#0000ff', // 蓝
+            '#4b0082', // 靛
+            '#9400d3'  // 紫
+        ];
+        
+        const lights = document.querySelectorAll('.light');
+        let animationInterval;
+        let isAnimating = false;
+        
+        function getRandomColors() {
+            // 创建一个颜色数组的副本
+            let availableColors = [...colors];
+            let shuffledColors = [];
+            
+            // 随机打乱颜色数组
+            while (availableColors.length > 0) {
+                const randomIndex = Math.floor(Math.random() * availableColors.length);
+                shuffledColors.push(availableColors[randomIndex]);
+                availableColors.splice(randomIndex, 1);
+            }
+            
+            return shuffledColors;
+        }
+        
+        function changeColors() {
+            // 获取一组随机但不重复的7个颜色
+            const newColors = getRandomColors();
+            
+            // 为每个灯分配一个新颜色
+            lights.forEach((light, index) => {
+                light.style.backgroundColor = newColors[index];
+            });
+        }
+        
+        function startAnimation() {
+            if (isAnimating) return;
+            
+            isAnimating = true;
+            lights.forEach(light => {
+                light.classList.add('active');
+            });
+            
+            // 每2秒改变一次颜色
+            animationInterval = setInterval(changeColors, 2000);
+            changeColors(); // 初始改变颜色
+        }
+        
+        function stopAnimation() {
+            if (!isAnimating) return;
+            
+            isAnimating = false;
+            clearInterval(animationInterval);
+            lights.forEach(light => {
+                light.classList.remove('active');
+            });
+        }
+        
+        document.getElementById('startBtn').addEventListener('click', startAnimation);
+        document.getElementById('stopBtn').addEventListener('click', stopAnimation);
+    </script>
+</body>
+</html>
